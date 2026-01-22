@@ -1,0 +1,64 @@
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MapPin, Clock, GraduationCap } from "lucide-react";
+
+export default function OpportunityCard({ opportunity }) {
+  return (
+    <Card className="hover:shadow-xl transition-shadow rounded-xl h-full border border-gray-200 flex flex-col p-4">
+      {/* Header */}
+      <CardHeader className="space-y-2 p-0">
+        <div className="flex justify-between items-start">
+          <h3 className="text-lg font-semibold text-[#1E3A8A]">{opportunity.title}</h3>
+          <Badge className="bg-blue-100 text-blue-800">{opportunity.posted}</Badge>
+        </div>
+        <p className="text-sm text-gray-600">{opportunity.company}</p>
+      </CardHeader>
+
+      {/* Card Content */}
+      <CardContent className="flex flex-col flex-1 space-y-3 p-0">
+        {/* Location & Salary */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+          <span className="flex items-center gap-1">
+            <MapPin size={16} /> {opportunity.location}
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock size={16} /> {opportunity.salary}
+          </span>
+        </div>
+
+        {/* Eligibility */}
+        <div className="flex items-start gap-2 text-sm min-h-12">
+          <GraduationCap size={18} className="text-gray-500 mt-0.5" />
+          <p className="text-gray-700 line-clamp-2">
+            <span className="font-medium text-gray-900">Eligibility:</span> {opportunity.eligibility}
+          </p>
+        </div>
+
+        {/* Description */}
+        <p className="text-sm text-gray-600 line-clamp-3 min-h-12">
+          {opportunity.description}
+        </p>
+
+        {/* Skills/Tags */}
+        <div className="flex flex-wrap gap-2 mt-1">
+          {opportunity.tags.map((tag, index) => (
+            <span
+              key={index}
+              className="text-blue-700 border border-blue-300 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50 transition-colors cursor-default"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Apply Button */}
+        <div className="mt-auto flex justify-end">
+          <Button className="cursor-pointer bg-[#1E3A8A] text-white hover:bg-[#374BA0] transition-colors">
+            Apply Now
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
