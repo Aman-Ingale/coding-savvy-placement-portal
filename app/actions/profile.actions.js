@@ -11,7 +11,7 @@ export async function createProfile(profileData) {
 
     const data = {
       ...profileData,
-      skills: processSkills(profileData.skills),
+      skills: (profileData.skills),
       created_at: now,
       updated_at: now,
     };
@@ -46,7 +46,7 @@ export async function updateProfile(profileId, profileData) {
     const data = {
       ...profileData,
       ...(profileData.skills && {
-        skills: processSkills(profileData.skills),
+        skills: (profileData.skills),
       }),
       updated_at: now,
     };

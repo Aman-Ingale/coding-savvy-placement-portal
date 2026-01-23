@@ -1,26 +1,30 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import ProfileForm from "@/components/ProfileForm";
-import { useEffect } from "react";
+"use client"
+import ProfileCard from "@/components/profile/ProfileCard";
+import SkillsList from "@/components/profile/SkillsList";
+import ResumeCard from "@/components/profile/ResumeCard";
+import { useEffect, useState } from "react";
 import { getProfileById } from "../actions/profile.actions";
 
-const ResumeUploader = dynamic(
-  () => import("@/components/ResumeUploader"),
-  { ssr: false }
-);
-
 export default function ProfilePage() {
+  const [profile, setProfile] = useState({})
+  useEffect(() => {
+    async function getData() {
+      // Hardcoded for now, will be updated after auth
+      const data = await getProfileById("455be2f7-b09f-4c5c-9587-ee0d50440c14")
+      setProfile(data.data)
+    }
+    getData()
+  }, [])
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#6a85b6] to-[#bac8e0] flex items-center justify-center px-4 py-12">
-      <div className="bg-[#344a72] p-8 rounded-2xl shadow-xl w-full max-w-2xl text-white space-y-6">
-        <h1 className="text-3xl font-bold">Student Profile</h1>
-        <p className="text-blue-200">Manage your personal details and resume</p>
+    <div className="min-h-screen bg-slate-100 px-4 py-8">
+      <div className="max-w-5xl mx-auto grid gap-6 md:grid-cols-3">
+        <ProfileCard profile={profile} />
+        <div className="md:col-span-2 space-y-6">
 
-        <ProfileForm />
-        <ResumeUploader />
+          <SkillsList skills={profile?.skills?.split(",").map(item => item.trim())} />
+          <ResumeCard resumeUrl={profile?.resume_url} />
+        </div>
       </div>
     </div>
   );
 }
-

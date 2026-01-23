@@ -18,7 +18,7 @@ function processSkills(skills) {
 // create opportunity
 export async function createOpportunity(data) {
     const supabase = await createClient();
-  data.required_skills = processSkills(data.required_skills)
+  data.required_skills = (data.required_skills)
 
   const { data: opportunity, error } = await supabase
     .from("opportunities")
@@ -34,7 +34,7 @@ export async function createOpportunity(data) {
 export async function updateOpportunity(id, data) {
     const supabase = await createClient();
   if (data.required_skills) {
-    data.required_skills = processSkills(data.required_skills)
+    data.required_skills = (data.required_skills)
   }
 
   const { data: opportunity, error } = await supabase

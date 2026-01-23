@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Clock, GraduationCap } from "lucide-react";
 
 export default function OpportunityCard({ opportunity }) {
-  return (
+  return ( 
     <Card className="hover:shadow-xl transition-shadow rounded-xl h-full border border-gray-200 flex flex-col p-4">
       {/* Header */}
       <CardHeader className="space-y-2 p-0">
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold text-[#1E3A8A]">{opportunity.role}</h3>
+          <h3 className="text-lg font-semibold text-blue-600">{opportunity.role}</h3>
           {/* <Badge className="bg-blue-100 text-blue-800">{opportunity.posted}</Badge> */}
         </div>
         <p className="text-sm text-gray-600">{opportunity.company_name}</p>
@@ -54,7 +54,7 @@ export default function OpportunityCard({ opportunity }) {
 
         {/* Apply Button */}
         <div className="mt-auto flex justify-end">
-          <Button className="cursor-pointer bg-[#1E3A8A] text-white hover:bg-[#374BA0] transition-colors">
+          <Button className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700 transition-colors">
             Apply Now
           </Button>
         </div>

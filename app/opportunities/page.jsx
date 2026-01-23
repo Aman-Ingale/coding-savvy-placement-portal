@@ -12,7 +12,7 @@ export default function OpportunitiesPage() {
   const [opportunities, setOpportunities] = useState([]);
   
   const filteredOpportunities = opportunities?.filter((item) =>
-    `${item.title} ${item.company} ${item.tags?.join(" ")}`
+    `${item.role} ${item.company_name} ${item.tags?.join(" ")}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );

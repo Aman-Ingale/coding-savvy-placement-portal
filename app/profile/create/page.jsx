@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { createProfile } from "@/app/actions/profile.actions";
 
 export default function CreateProfilePage() {
   const router = useRouter();
@@ -16,14 +17,12 @@ export default function CreateProfilePage() {
     college: "",
     branch: "",
     skills: "",
-    image: null,
-    imagePreview: null,
-    resume: null,
+    resume_url: null,
   });
 
-  const handleImageChange = (file, previewUrl) => {
-    setProfile({ ...profile, image: file, imagePreview: previewUrl });
-  };
+  // const handleImageChange = (file, previewUrl) => {
+  //   setProfile({ ...profile, image: file, imagePreview: previewUrl });
+  // };
 
   const handleResumeChange = (e) => {
     const file = e.target.files?.[0];
@@ -33,7 +32,7 @@ export default function CreateProfilePage() {
 
   const handleSubmit = () => {
     console.log("Profile data ready for backend:", profile);
-    alert("Profile saved (frontend only)");
+    createProfile(profile)
     router.push("/profile");
   };
 
@@ -44,10 +43,10 @@ export default function CreateProfilePage() {
 
         {/* Profile Image */}
         <div className="flex justify-center">
-          <ProfileImageUploader
+          {/* <ProfileImageUploader
             image={profile.imagePreview}
             onChange={handleImageChange}
-          />
+          /> */}
         </div>
 
         {/* Name */}

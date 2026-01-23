@@ -9,7 +9,7 @@ export default function SkillsList({ skills }) {
       </CardHeader>
 
       <CardContent className="flex flex-wrap gap-2">
-        {skills.length > 0 ? (
+        {skills?.length > 0 ? (
           skills.map((skill, index) => (
             <Badge
               key={index}
