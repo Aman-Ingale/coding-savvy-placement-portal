@@ -1,87 +1,201 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/supabaseClient"
+import { createClient } from "@/lib/supabase/supabaseServer";
 
 // helper to normalize required_skills
 function processSkills(skills) {
-  if (!skills) return []
+  if (!skills) return [];
 
   if (Array.isArray(skills)) {
-    return skills.map(s => s.trim().toLowerCase())
+    return [...new Set(skills.map((s) => String(s).trim()).filter((s) => s))];
   }
 
-  return skills
-    .split(",")
-    .map(s => s.trim().toLowerCase())
+  if (typeof skills === "string") {
+    return [
+      ...new Set(
+        skills
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s),
+      ),
+    ];
+  }
+
+  return [];
 }
 
 // create opportunity
-export async function createOpportunity(data) {
+export async function createOpportunity(opportunityData) {
+  try {
     const supabase = await createClient();
-  data.required_skills = processSkills(data.required_skills)
 
-  const { data: opportunity, error } = await supabase
-    .from("opportunities")
-    .insert([data])
-    .select()
-    .single()
+    if (!opportunityData.company?.trim() || !opportunityData.role?.trim()) {
+      return {
+        success: false,
+        error: "Company and role are required",
+      };
+    }
 
-  if (error) throw error
-  return opportunity
+    const data = {
+      ...opportunityData,
+      company: opportunityData.company.trim(),
+      role: opportunityData.role.trim(),
+      description: opportunityData.description?.trim() || "",
+      status : opportunityData.status?.trim() || "Open",
+      required_skills: processSkills(opportunityData.required_skills),
+    };
+
+    const { data: newOpportunity, error } = await supabase
+      .from("opportunities")
+      .insert([data])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating opportunity : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: newOpportunity };
+  } catch (err) {
+    console.error("Error creating opportunity : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while creating oppportunity",
+    };
+  }
 }
 
+
 // update opportunity
-export async function updateOpportunity(id, data) {
-    const supabase = await createClient();
-  if (data.required_skills) {
-    data.required_skills = processSkills(data.required_skills)
+export async function updateOpportunity(id, opportunityData) {
+  if (!id) {
+    return {
+      success: false,
+      error: "Opportunity ID is required",
+    };
   }
 
-  const { data: opportunity, error } = await supabase
-    .from("opportunities")
-    .update(data)
-    .eq("id", id)
-    .select()
-    .single()
+  try {
+    const supabase = await createClient();
 
-  if (error) throw error
-  return opportunity
+    const data = {
+      ...opportunityData,
+      ...(opportunityData.required_skills && {
+        required_skills: processSkills(opportunityData.required_skills),
+      }),
+      updated_at: new Date().toISOString()
+    };
+
+
+    const { data: updatedOpportunity, error } = await supabase
+      .from("opportunities")
+      .update(data)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating opportunity : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: updatedOpportunity };
+  } catch (err) {
+    console.error("Error updating opportunity : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while updating opportunity",
+    };
+  }
 }
 
 // close opportunity
 export async function closeOpportunity(id) {
-    const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("opportunities")
-    .update({ status: "Closed" })
-    .eq("id", id)
-    .select()
-    .single()
+  if (!id) {
+    return {
+      success: false,
+      error: "Opportunity ID is required",
+    };
+  }
 
-  if (error) throw error
-  return data
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("opportunities")
+      .update({ status: "Closed", updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error closing opportunity : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Error closing opportunity : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while closing opportunity",
+    };
+  }
 }
 
 // get all opportunities
 export async function getAllOpportunities() {
+  try {
     const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("opportunities")
-    .select("*")
+    const { data, error } = await supabase
+      .from("opportunities")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) throw error
-  return data
+    if (error) {
+      console.error("Error getting opportunities : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Error getting opportunities : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while getting opportunities",
+    };
+  }
 }
 
 // get opportunity by id
 export async function getOpportunityById(id) {
-    const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("opportunities")
-    .select("*")
-    .eq("id", id)
-    .single()
+  if (!id) {
+    return {
+      success: false,
+      error: "Opportunity ID is required",
+    };
+  }
 
-  if (error) throw error
-  return data
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("opportunities")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error getting opportunity : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Error getting opportunity : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while getting opportunity",
+    };
+  }
 }
