@@ -1,13 +1,26 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/supabaseClient"
+import { supabase } from "@/lib/supabaseServer"
+
+// helper to normalize required_skills
+function processSkills(skills) {
+  if (!skills) return []
+
+  if (Array.isArray(skills)) {
+    return skills.map(s => s.trim().toLowerCase())
+  }
+
+  return skills
+    .split(",")
+    .map(s => s.trim().toLowerCase())
+}
 
 // create opportunity
 export async function createOpportunity(data) {
-    const supabase = await createClient();
+  data.required_skills = processSkills(data.required_skills)
+
   const { data: opportunity, error } = await supabase
     .from("opportunities")
-    .insert(data)
     .insert([data])
     .select()
     .single()
@@ -18,7 +31,10 @@ export async function createOpportunity(data) {
 
 // update opportunity
 export async function updateOpportunity(id, data) {
-    const supabase = await createClient();
+  if (data.required_skills) {
+    data.required_skills = processSkills(data.required_skills)
+  }
+
   const { data: opportunity, error } = await supabase
     .from("opportunities")
     .update(data)
