@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { createProfile, getProfileById } from "@/app/actions/profile.actions";
+import { useEffect, useState } from "react";
 
 export default function ProfileForm() {
   const [profile, setProfile] = useState({
@@ -10,13 +11,15 @@ export default function ProfileForm() {
     branch: "",
     skills: "",
   });
-
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
-
+  // for testing
+  async function handleSubmit(params) {
+    // await createProfile(profile);
+  }
   return (
-    <form className="space-y-4">
+    <form className="space-y-4" onSubmit={handleSubmit}>
       {[
         { label: "Name", name: "name", placeholder: "Eg: John Doe" },
         { label: "Email", name: "email", placeholder: "Eg: johndoe@gmail.com" },

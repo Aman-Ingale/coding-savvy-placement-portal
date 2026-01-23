@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 import ProfileForm from "@/components/ProfileForm";
+import { useEffect } from "react";
+import { getProfileById } from "../actions/profile.actions";
 
 const ResumeUploader = dynamic(
   () => import("@/components/ResumeUploader"),

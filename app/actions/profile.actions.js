@@ -1,7 +1,7 @@
 // CRUD Operation for student profile
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/supabaseClient";
 
 export async function createProfile(profileData) {
   try {
