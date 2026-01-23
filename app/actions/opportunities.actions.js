@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseServer"
 export async function createOpportunity(data) {
   const { data: opportunity, error } = await supabase
     .from("opportunities")
-    .insert(data)
+    .insert([data])
     .select()
     .single()
 
