@@ -42,7 +42,7 @@ export async function createOpportunity(opportunityData) {
       role: opportunityData.role.trim(),
       description: opportunityData.description?.trim() || "",
       status : opportunityData.status?.trim() || "Open",
-      required_skills: processSkills(opportunityData.required_skills),
+      required_skills: (opportunityData.required_skills),
     };
 
     const { data: newOpportunity, error } = await supabase
@@ -82,7 +82,7 @@ export async function updateOpportunity(id, opportunityData) {
     const data = {
       ...opportunityData,
       ...(opportunityData.required_skills && {
-        required_skills: processSkills(opportunityData.required_skills),
+        required_skills: (opportunityData.required_skills),
       }),
       updated_at: new Date().toISOString()
     };
