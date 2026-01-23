@@ -1,11 +1,17 @@
-// CRUD Operation for student profile
 "use server";
 
-import { createClient } from "@/lib/supabase/supabaseClient";
+import { createClient } from "@/lib/supabase/supabaseServer";
 
 export async function createProfile(profileData) {
   try {
     const supabase = await createClient();
+
+    if (!profileData.name?.trim()) {
+      return {
+        success: false,
+        error: "name is required",
+      };
+    }
 
     const now = new Date().toISOString();
 
@@ -38,6 +44,13 @@ export async function createProfile(profileData) {
 }
 
 export async function updateProfile(profileId, profileData) {
+  if (!profileId) {
+    return { 
+      success: false, 
+      error: "Profile ID is required" 
+    };
+  }
+
   try {
     const supabase = await createClient();
 
@@ -74,6 +87,12 @@ export async function updateProfile(profileId, profileData) {
 }
 
 export async function getProfileById(profileId) {
+  if (!profileId) {
+    return { 
+      success: false, 
+      error: "Profile ID is required" 
+    };
+  }
   try {
     const supabase = await createClient();
 
@@ -122,14 +141,21 @@ export async function getAllProfiles() {
 }
 
 export async function deleteProfileById(profileId) {
+  if (!profileId) {
+    return { 
+      success: false, 
+      error: "Profile ID is required" 
+    };
+  }
+
   try {
     const supabase = await createClient();
 
     const { data: deletedProfile, error } = await supabase
       .from("profiles")
       .delete()
-      .select()
       .eq("id", profileId)
+      .select()
       .single();
 
     if (error) {
@@ -149,15 +175,22 @@ export async function deleteProfileById(profileId) {
 
 function processSkills(skills) {
   if (!skills) return [];
-
-  if (Array.isArray(skills)) return skills;
-
-  if (typeof skills === "string") {
-    return skills
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s);
+  
+  if (Array.isArray(skills)) {
+    return [...new Set(skills 
+      .map(s => String(s).trim())
+      .filter(s => s)
+    )];
   }
-
+  
+  if (typeof skills === "string") {
+    return [...new Set(skills 
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s)
+    )];
+      
+  }
+  
   return [];
 }
