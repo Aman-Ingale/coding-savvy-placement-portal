@@ -1,20 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OpportunityCard from "@/components/OpportunityCard";
-import { opportunities } from "@/data/opportunities";
+// import { opportunities } from "@/data/opportunities";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { getAllOpportunities } from "../actions/opportunities.actions";
 
 export default function OpportunitiesPage() {
   const [search, setSearch] = useState("");
-
-  const filteredOpportunities = opportunities.filter((item) =>
-    `${item.title} ${item.company} ${item.tags.join(" ")}`
+  const [opportunities, setOpportunities] = useState([]);
+  
+  const filteredOpportunities = opportunities?.filter((item) =>
+    `${item.title} ${item.company} ${item.tags?.join(" ")}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
-
+  useEffect(() => {
+    async function getData() {
+      const temp = await getAllOpportunities()
+      setOpportunities(temp)
+      console.log(temp)
+    }
+    getData()
+  }, [])
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -43,9 +52,9 @@ export default function OpportunitiesPage() {
         {/* Opportunities Grid */}
         {filteredOpportunities.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredOpportunities.map((opportunity) => (
+            {filteredOpportunities?.map((opportunity,index) => (
               <OpportunityCard
-                key={opportunity.id}
+                key={index}
                 opportunity={opportunity}
               />
             ))}

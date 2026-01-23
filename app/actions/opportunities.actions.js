@@ -1,12 +1,14 @@
 "use server"
 
-import { supabase } from "@/lib/supabaseServer"
+import { createClient } from "@/lib/supabase/supabaseClient"
 
 // create opportunity
 export async function createOpportunity(data) {
+    const supabase = await createClient();
   const { data: opportunity, error } = await supabase
     .from("opportunities")
     .insert(data)
+    .insert([data])
     .select()
     .single()
 
@@ -16,6 +18,7 @@ export async function createOpportunity(data) {
 
 // update opportunity
 export async function updateOpportunity(id, data) {
+    const supabase = await createClient();
   const { data: opportunity, error } = await supabase
     .from("opportunities")
     .update(data)
@@ -29,6 +32,7 @@ export async function updateOpportunity(id, data) {
 
 // close opportunity
 export async function closeOpportunity(id) {
+    const supabase = await createClient();
   const { data, error } = await supabase
     .from("opportunities")
     .update({ status: "Closed" })
@@ -42,10 +46,10 @@ export async function closeOpportunity(id) {
 
 // get all opportunities
 export async function getAllOpportunities() {
+    const supabase = await createClient();
   const { data, error } = await supabase
     .from("opportunities")
     .select("*")
-    .order("created_at", { ascending: false })
 
   if (error) throw error
   return data
@@ -53,6 +57,7 @@ export async function getAllOpportunities() {
 
 // get opportunity by id
 export async function getOpportunityById(id) {
+    const supabase = await createClient();
   const { data, error } = await supabase
     .from("opportunities")
     .select("*")
