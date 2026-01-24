@@ -13,25 +13,25 @@ export default function ProfileCard({ profile }) {
       <CardContent className="p-6 text-center space-y-4">
 
         <Avatar className="w-28 h-28 mx-auto">
-          {profile.image && (
+          {/* {profile.image && (
             <AvatarImage
               src={profile.image}
               alt="Profile image"
             />
-          )}
+          )} */}
           <AvatarFallback className="bg-blue-600 text-white text-2xl">
-            {profile.name?.charAt(0)}
+            {profile?.name?.charAt(0)}
           </AvatarFallback>
         </Avatar>
 
         <div>
-          <h2 className="text-xl font-semibold">{profile.name}</h2>
-          <p className="text-sm text-slate-500">{profile.branch}</p>
+          <h2 className="text-xl font-semibold">{profile?.name}</h2>
+          <p className="text-sm text-slate-500">{profile?.branch}</p>
         </div>
 
         <div className="text-sm text-slate-700 space-y-1">
-          <p><strong>College:</strong> {profile.college}</p>
-          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>College:</strong> {profile?.college}</p>
+          <p><strong>Email:</strong> {profile?.email}</p>
         </div>
 
         <Button

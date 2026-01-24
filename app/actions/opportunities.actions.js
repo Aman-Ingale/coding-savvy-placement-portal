@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/supabaseServer";
+import { createClient } from "@/lib/supabase/supabaseClient";
 
 // helper to normalize required_skills
 function processSkills(skills) {

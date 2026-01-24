@@ -19,8 +19,8 @@ export default function OpportunitiesPage() {
   useEffect(() => {
     async function getData() {
       const temp = await getAllOpportunities()
-      setOpportunities(temp)
-      console.log(temp)
+      setOpportunities(temp.data)
+      console.log(temp.data)
     }
     getData()
   }, [])
