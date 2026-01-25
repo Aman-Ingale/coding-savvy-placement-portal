@@ -1,17 +1,27 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
-// Updated opportunities with package ranges (LPA)
-const opportunities = [
-  { id: 1, company: "TechNova", role: "SDE Intern", skills: "Java, React", deadline: "2026-03-10", eligibility: "B.Tech CS", location: "Bangalore", package: "4-6 LPA" },
-  { id: 2, company: "FinCorp", role: "Data Analyst", skills: "Python, SQL", deadline: "2026-02-25", eligibility: "B.Sc/BE", location: "Mumbai", package: "4-6 LPA" },
-  { id: 3, company: "GreenSoft", role: "Frontend Developer", skills: "React, Next.js", deadline: "2026-03-15", eligibility: "B.Tech CS/IT", location: "Remote", package: "6-8 LPA" },
-  { id: 4, company: "HealthPlus", role: "Backend Intern", skills: "Node.js, MongoDB", deadline: "2026-03-05", eligibility: "BE/ME CS", location: "Hyderabad", package: "4-6 LPA" },
-  { id: 5, company: "EduLearn", role: "Fullstack Intern", skills: "React, Node.js, SQL", deadline: "2026-04-01", eligibility: "B.Tech CS", location: "Delhi", package: "6-8 LPA" },
-];
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { getAllOpportunities } from "@/app/actions/opportunities.actions";
 
 export default function OpportunitiesPage() {
+  const [opportunities, setOpportunities] = useState([]);
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const temp = await getAllOpportunities();
+        setOpportunities(temp.data ?? []);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, []);
+
   return (
     <div>
       <div className="flex justify-between mb-6">
@@ -22,23 +32,80 @@ export default function OpportunitiesPage() {
       </div>
 
       <div className="space-y-4">
-        {opportunities.map((opp) => (
-          <Card key={opp.id} className="shadow-sm hover:shadow-md transition">
-            <CardContent className="flex justify-between items-center p-4">
-              <div>
-                <h3 className="font-semibold text-gray-900">{opp.role}</h3>
-                <p className="text-sm text-gray-500">{opp.company}</p>
-                <p className="text-sm text-gray-400">Skills: {opp.skills}</p>
-                <p className="text-sm text-gray-400">Eligibility: {opp.eligibility}</p>
-                <p className="text-sm text-gray-400">Location: {opp.location}</p>
-                <p className="text-sm text-gray-400">Package: {opp.package}</p>
-                <p className="text-sm text-gray-400">Deadline: {opp.deadline}</p>
+        {opportunities.map((opp, index) => (
+          <Card
+            key={opp?.id ?? index}
+            className="border border-gray-200 hover:border-gray-300 hover:shadow-md transition"
+          >
+            <CardContent className="p-5 flex justify-between gap-6">
+              <div className="space-y-2">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {opp?.role}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {opp?.company_name}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                  <div>
+                    <Label className="text-xs text-gray-500">
+                      Required Skills
+                    </Label>
+                    <p className="text-gray-700">
+                      {opp?.required_skills || "-"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-500">Status</Label>
+                    <Badge
+                      variant={
+                        opp?.status === "active" ? "default" : "secondary"
+                      }
+                    >
+                      {opp?.status}
+                    </Badge>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-500">Description</Label>
+                    <p className="text-gray-700 line-clamp-2">
+                      {opp?.description || "-"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-500">Deadline</Label>
+                    <p className="text-gray-700">
+                      {opp?.deadline
+                        ? new Date(opp.deadline)
+                            .toISOString()
+                            .slice(0, 10)
+                        : "-"}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Link href={`/admin/opportunities/${opp.id}/edit`}>
-                  <Button variant="outline" className="text-gray-900 border-gray-300">Edit</Button>
+
+              <div className="flex flex-col justify-between items-end gap-4">
+                <div className="flex gap-2">
+                  <Link href={`/admin/opportunities/${opp.id}/edit`}>
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
+                  </Link>
+                  <Button variant="destructive" size="sm">
+                    Close
+                  </Button>
+                </div>
+
+                <Link href={`/admin/opportunities/${opp.id}/applicants`}>
+                  <Button variant="secondary" size="sm">
+                    View Applications
+                  </Button>
                 </Link>
-                <Button variant="destructive">Close</Button>
               </div>
             </CardContent>
           </Card>
