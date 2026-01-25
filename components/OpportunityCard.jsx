@@ -2,8 +2,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, GraduationCap } from "lucide-react";
+import { applyToOpportunity } from "@/app/actions/applications.actions";
 
 export default function OpportunityCard({ opportunity }) {
+  const stuid = "8694f8c4-39f4-4344-b225-419b586215d1"
+  function handleApply(id) {
+    applyToOpportunity(stuid,id)
+  }
   return ( 
     <Card className="hover:shadow-xl transition-shadow rounded-xl h-full border border-gray-200 flex flex-col p-4">
       {/* Header */}
@@ -54,7 +59,7 @@ export default function OpportunityCard({ opportunity }) {
 
         {/* Apply Button */}
         <div className="mt-auto flex justify-end">
-          <Button className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+          <Button className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700 transition-colors" onClick={(id)=>handleApply(opportunity.id)}>
             Apply Now
           </Button>
         </div>

@@ -29,16 +29,15 @@ export async function applyToOpportunity(studId, oppId) {
     const supabase = await createClient();
 
     // Check opportunity is valid and open
-    const opportunityCheck = await checkDeadline(supabase, oppId);
-    if (!opportunityCheck.success) {
-      return opportunityCheck;
-    }
+    // const opportunityCheck = await checkDeadline(supabase, oppId);
+    // if (!opportunityCheck.success) {
+    //   return opportunityCheck;
+    // }
 
     //new application
     const appData = {
       student_id: studId,
       opportunity_id: oppId,
-      applied_at: new Date().toISOString(),
       status: "applied", // Default status
     };
 
