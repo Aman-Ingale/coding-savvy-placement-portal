@@ -88,24 +88,76 @@ export async function getMyApplications(studId) {
 }
 
 //admin view
+// export async function getApplicantsByOpportunity(oppId) {
+//   try {
+//     const supabase = await createClient();
+
+//     const { data: applicants, error } = await supabase
+//       .from("applications")
+//       .select(`
+//     id,
+//     status,
+//     profiles (
+//       id,
+//       name,
+//       college,
+//       branch,
+//       skills,
+//     ),
+//     opportunities (
+//       company_name,
+//       role
+//     )
+//   `).eq("opportunity_id", opportunityId);
+
+//     if (error) {
+//       console.error("Error getting applicants: ", error.message);
+//       return { success: false, error: error.message };
+//     }
+
+//     return { success: true, data: applicants || [] };
+//   } catch (err) {
+//     console.error("Error getting applicants: ", err.message);
+//     return {
+//       success: false,
+//       error: "An unexpected error occurred while getting applicants",
+//     };
+//   }
+// }
 export async function getApplicantsByOpportunity(oppId) {
   try {
     const supabase = await createClient();
 
-    const { data: applicants, error } = await supabase
+    const { data, error } = await supabase
       .from("applications")
-      .select("*")
-      .eq("opportunity_id", oppId)
-      .order("applied_at", { ascending: false });
+      .select(`
+        id,
+        status,
+        profiles (
+          id,
+          name,
+          email,
+          college,
+          branch,
+          skills,
+          resume_url
+        ),
+        opportunities (
+          id,
+          company_name,
+          role
+        )
+      `)
+      .eq("opportunity_id", oppId);
 
     if (error) {
-      console.error("Error getting applicants: ", error.message);
+      console.error("Error getting applicants:", error.message);
       return { success: false, error: error.message };
     }
 
-    return { success: true, data: applicants || [] };
+    return { success: true, data: data ?? [] };
   } catch (err) {
-    console.error("Error getting applicants: ", err.message);
+    console.error("Error getting applicants:", err.message);
     return {
       success: false,
       error: "An unexpected error occurred while getting applicants",
