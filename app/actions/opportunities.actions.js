@@ -67,7 +67,6 @@ export async function createOpportunity(opportunityData) {
   }
 }
 
-
 // update opportunity
 export async function updateOpportunity(id, opportunityData) {
   if (!id) {
@@ -83,11 +82,10 @@ export async function updateOpportunity(id, opportunityData) {
     const data = {
       ...opportunityData,
       ...(opportunityData.required_skills && {
-        required_skills: (opportunityData.required_skills),
+        required_skills: opportunityData.required_skills,
       }),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
-
 
     const { data: updatedOpportunity, error } = await supabase
       .from("opportunities")
