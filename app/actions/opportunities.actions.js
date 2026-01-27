@@ -42,8 +42,14 @@ export async function createOpportunity(opportunityData) {
       company_name: opportunityData.company_name.trim(),
       role: opportunityData.role.trim(),
       description: opportunityData.description?.trim() || "",
-      status : opportunityData.status?.trim() || "active",
-      required_skills: (opportunityData.required_skills),
+      status: opportunityData.status?.trim() || "Open",
+      required_skills: opportunityData.required_skills,
+      salary: opportunityData.salary ? Number(opportunityData.salary) : "",
+      experience: opportunityData.experience
+        ? Number(opportunityData.experience)
+        : "",
+      location: opportunityData.location?.trim() || "",
+      no_of_opening : opportunityData.no_of_opening
     };
 
     const { data: newOpportunity, error } = await supabase
