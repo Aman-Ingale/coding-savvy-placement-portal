@@ -48,6 +48,7 @@ export async function createOpportunity(opportunityData) {
         ? Number(opportunityData.experience)
         : "",
       location: opportunityData.location?.trim() || "",
+      no_of_opening : opportunityData.no_of_opening
     };
 
     const { data: newOpportunity, error } = await supabase
