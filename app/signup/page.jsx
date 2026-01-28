@@ -16,16 +16,15 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useRouter } from "next/navigation";
-import { createProfile, getProfileByUserId } from "../actions/profile.actions";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter()
+
   // ✅ FORM STATE
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -39,79 +38,44 @@ export default function LoginPage() {
     }));
   }
 
-  // ✅ HANDLE LOGIN
-  async function handleLogin(e) {
+  // ✅ HANDLE SUBMIT
+  async function handleSignup(e) {
     e.preventDefault();
 
-    const { email, password } = formData;
+    const { name, email, password } = formData;
 
-    if (!email || !password) {
-      alert("Email and password are required");
+    if (!name || !email || !password) {
+      alert("All fields are required");
       return;
     }
 
     setLoading(true);
-    const result = await signIn(email, password);
+    await SignUp(email, password, name);
     setLoading(false);
   }
 
-  // ✅ SUPABASE LOGIN
-  async function signIn(email, password) {
+  // ✅ SUPABASE SIGNUP
+  async function SignUp(email, password, name) {
     try {
       const supabase = await createClient();
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: name,
+            role: role, // student / admin
+          },
+        },
       });
 
       if (error) {
-        return { success: false, message: error.message };
+        console.log(error.message);
+        return;
       }
 
-
-      console.log("Login success:", data);
-      if (data.user.email == "admin@gmail.com") {
-        router.push("admin/dashboard")
-      }
-      else {
-        const { user1: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .single();
-
-        if (profile) {
-          router.push("opportunities")
-        }
-        else {
-          if((await getProfileByUserId(data.user.id)).success){
-
-            router.push("/profile/edit");
-          }
-          else{
-            const { error: createError } = await supabase
-              .from("profiles")
-              .upsert([
-                {
-                  user_id: data.user.id,
-                  name: data.user.user_metadata?.full_name
-                },
-              ])
-              .select()
-              .single();;
-  
-  
-            if (createError) {
-              console.error("Error creating profile:", createError.message);
-              return;
-            }
-
-          }
-        }
-      }
-      // 🔥 OPTIONAL: role-based redirect later
-      // const role = data.user.user_metadata.role
+      console.log("Signup success:", data);
     } catch (err) {
       console.log(err);
     }
@@ -122,7 +86,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome to Coding Savvy</CardTitle>
-          <CardDescription>Login to your account</CardDescription>
+          <CardDescription>Create your account</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -134,7 +98,18 @@ export default function LoginPage() {
             </TabsList>
           </Tabs>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
+            {/* NAME */}
+            <div className="space-y-1">
+              <Label>Name</Label>
+              <Input
+                name="name"
+                placeholder="John"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+
             {/* EMAIL */}
             <div className="space-y-1">
               <Label>Email Address</Label>
@@ -187,28 +162,21 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* DIVIDER */}
+          {/* OAUTH */}
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-border" />
             <span className="px-3 text-xs text-muted-foreground">OR</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          {/* OAUTH */}
           <div className="space-y-3">
             <Button variant="outline" className="w-full gap-2">
-              <img
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                className="w-5"
-              />
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5" />
               Continue with Google
             </Button>
 
             <Button variant="outline" className="w-full gap-2">
-              <img
-                src="https://www.svgrepo.com/show/512317/github-142.svg"
-                className="w-5"
-              />
+              <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5" />
               Continue with GitHub
             </Button>
           </div>

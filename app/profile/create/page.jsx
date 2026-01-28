@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProfileImageUploader from "@/components/profile/ProfileImageUploader";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { createProfile } from "@/app/actions/profile.actions";
+import { createClient } from "@/lib/supabase/supabaseClient";
 
 export default function CreateProfilePage() {
   const router = useRouter();
@@ -20,9 +21,11 @@ export default function CreateProfilePage() {
     resume_url: null,
   });
 
-  // const handleImageChange = (file, previewUrl) => {
-  //   setProfile({ ...profile, image: file, imagePreview: previewUrl });
-  // };
+  useEffect(() => {
+    async function getData() {
+    }
+    getData()
+  }, [])
 
   const handleResumeChange = (e) => {
     const file = e.target.files?.[0];

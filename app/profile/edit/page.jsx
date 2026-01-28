@@ -1,24 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProfileImageUploader from "@/components/profile/ProfileImageUploader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { getProfileById, updateProfile } from "@/app/actions/profile.actions";
+import { getProfileByUserId, updateProfile } from "@/app/actions/profile.actions";
+import { createClient } from "@/lib/supabase/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function EditProfilePage() {
   const [profile, setProfile] = useState({});
+  const router = useRouter();
+
   useEffect(() => {
     async function getData() {
-      // Hardcoded for now, will be updated after auth
-      const data = await getProfileById("8694f8c4-39f4-4344-b225-419b586215d1")
-      setProfile(data.data)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { success, data, error } = await getProfileByUserId(user.id);
+
+      if (success) {
+        setProfile(data);
+      } else {
+        console.error("Error fetching profile:", error);
+      }
     }
-    getData()
-  }, [])
+
+    getData();
+  }, []);
 
   // Field change
   const handleFieldChange = (field, value) => {
@@ -32,10 +45,37 @@ export default function EditProfilePage() {
     setProfile({ ...profile, resume: file });
   };
 
-  const handleSave = () => {
-    console.log("Updated profile data:", profile);
-    // hardcoded id for testing
-    updateProfile("455be2f7-b09f-4c5c-9587-ee0d50440c14",profile)
+  // Save changes
+  const handleSave = async () => {
+    try {
+      let updatedProfile = { ...profile };
+
+      // Handle resume upload to Supabase Storage if file exists
+      if (profile.resume instanceof File) {
+        const supabase = createClient();
+        const fileExt = profile.resume.name.split(".").pop();
+        const fileName = `${profile.user_id}/resume.${fileExt}`;
+        const { data: fileData, error: uploadError } = await supabase.storage
+          .from("resumes")
+          .upload(fileName, profile.resume, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        updatedProfile.resume_url = fileData.path; // save storage path
+        delete updatedProfile.resume; // remove file object
+      }
+
+      // Call updateProfile server action
+      const { success, error } = await updateProfile(profile.id, updatedProfile);
+
+      if (success) {
+        router.push("/profile");
+      } else {
+        console.error("Error updating profile:", error);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err.message);
+    }
   };
 
   return (
@@ -43,19 +83,11 @@ export default function EditProfilePage() {
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-6">
         <h1 className="text-2xl font-semibold text-center">Edit Profile</h1>
 
-        {/* Click-to-edit Profile Image */}
-        {/* <div className="flex justify-center">
-          <ProfileImageUploader
-            image={profile?.imagePreview}
-            onChange={handleImageChange}
-          />
-        </div> */}
-
         {/* Name */}
         <div className="space-y-2">
           <Label>Name</Label>
           <Input
-            value={profile?.name || "name"}
+            value={profile?.name || ""}
             onChange={(e) => handleFieldChange("name", e.target.value)}
           />
         </div>
@@ -64,7 +96,7 @@ export default function EditProfilePage() {
         <div className="space-y-2">
           <Label>College</Label>
           <Input
-            value={profile?.college || "college"}
+            value={profile?.college || ""}
             onChange={(e) => handleFieldChange("college", e.target.value)}
           />
         </div>
@@ -73,7 +105,7 @@ export default function EditProfilePage() {
         <div className="space-y-2">
           <Label>Branch</Label>
           <Input
-            value={profile?.branch || "branch"}
+            value={profile?.branch || ""}
             onChange={(e) => handleFieldChange("branch", e.target.value)}
           />
         </div>
@@ -83,7 +115,7 @@ export default function EditProfilePage() {
           <Label>Skills (comma separated)</Label>
           <Textarea
             placeholder="React, Next.js, Tailwind"
-            value={profile?.skills}
+            value={profile?.skills || ""}
             onChange={(e) => handleFieldChange("skills", e.target.value)}
           />
           <div className="flex gap-2 flex-wrap mt-2">
@@ -104,9 +136,9 @@ export default function EditProfilePage() {
         <div className="space-y-2">
           <Label>Resume (PDF)</Label>
           <Input type="file" accept=".pdf" onChange={handleResumeChange} />
-          {/* {profile.resume && (
-            <p className="text-sm text-slate-500">{profile?.resume?.name}</p>
-          )} */}
+          {profile?.resume_url && (
+            <p className="text-sm text-slate-500">Uploaded: {profile.resume_url}</p>
+          )}
         </div>
 
         <Button

@@ -6,11 +6,14 @@ import OpportunityCard from "@/components/OpportunityCard";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { getAllOpportunities } from "../actions/opportunities.actions";
+import { createClient } from "@/lib/supabase/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function OpportunitiesPage() {
   const [search, setSearch] = useState("");
   const [opportunities, setOpportunities] = useState([]);
-  
+  const router = useRouter()
+
   const filteredOpportunities = opportunities?.filter((item) =>
     `${item.role} ${item.company_name} ${item.tags?.join(" ")}`
       .toLowerCase()
@@ -18,9 +21,17 @@ export default function OpportunitiesPage() {
   );
   useEffect(() => {
     async function getData() {
-      const temp = await getAllOpportunities()
-      setOpportunities(temp.data)
-      console.log(temp.data)
+      const supabase = await createClient();
+      const { data: { user }, error } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        router.push('/login')
+      }
+      else {
+        const temp = await getAllOpportunities()
+        setOpportunities(temp.data)
+        console.log(temp.data)
+      }
     }
     getData()
   }, [])
@@ -52,7 +63,7 @@ export default function OpportunitiesPage() {
         {/* Opportunities Grid */}
         {filteredOpportunities.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredOpportunities?.map((opportunity,index) => (
+            {filteredOpportunities?.map((opportunity, index) => (
               <OpportunityCard
                 key={index}
                 opportunity={opportunity}

@@ -3,14 +3,20 @@ import ProfileCard from "@/components/profile/ProfileCard";
 import SkillsList from "@/components/profile/SkillsList";
 import ResumeCard from "@/components/profile/ResumeCard";
 import { useEffect, useState } from "react";
-import { getProfileById } from "../actions/profile.actions";
+import { getProfileById, getProfileByUserId } from "../actions/profile.actions";
+import { createClient } from "@/lib/supabase/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({})
+  const router = useRouter()
   useEffect(() => {
     async function getData() {
       // Hardcoded for now, will be updated after auth
-      const data = await getProfileById("8694f8c4-39f4-4344-b225-419b586215d1")
+              const supabase = await createClient();
+                const id = (await supabase.auth.getUser()).data.user.id
+                const data = await getProfileByUserId(id)
+                console.log(data)
       console.log(data)
       setProfile(data.data)
     }
