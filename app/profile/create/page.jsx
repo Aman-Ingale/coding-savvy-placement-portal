@@ -30,16 +30,22 @@ export default function CreateProfilePage() {
     setProfile({ ...profile, resume: file });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Profile data ready for backend:", profile);
-    createProfile(profile)
-    router.push("/profile");
+    const result = await createProfile(profile); // await
+    if (result.success) {
+      router.push("/profile"); // Only redirect on success
+    } else {
+      console.error(result.error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-100 px-4 py-8">
       <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-2xl font-semibold text-center">Create Your Profile</h1>
+        <h1 className="text-2xl font-semibold text-center">
+          Create Your Profile
+        </h1>
 
         {/* Profile Image */}
         <div className="flex justify-center">
@@ -65,7 +71,9 @@ export default function CreateProfilePage() {
           <Input
             placeholder="College Name"
             value={profile.college}
-            onChange={(e) => setProfile({ ...profile, college: e.target.value })}
+            onChange={(e) =>
+              setProfile({ ...profile, college: e.target.value })
+            }
           />
         </div>
 
