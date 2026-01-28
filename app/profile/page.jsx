@@ -34,7 +34,7 @@ export default function ProfilePage() {
         return;
       }
 
-      setProfile(result.data);
+      setProfile({...result.data, email : user.email});
     }
 
     getData();
