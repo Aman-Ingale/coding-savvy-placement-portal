@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@lib/supabase/supabaseServer";
+import { createClient } from "@/lib/supabase/supabaseClient";
 
 
 async function checkDeadline(supabase, oppId) {
@@ -29,16 +29,15 @@ export async function applyToOpportunity(studId, oppId) {
     const supabase = await createClient();
 
     // Check opportunity is valid and open
-    const opportunityCheck = await checkDeadline(supabase, oppId);
-    if (!opportunityCheck.success) {
-      return opportunityCheck;
-    }
+    // const opportunityCheck = await checkDeadline(supabase, oppId);
+    // if (!opportunityCheck.success) {
+    //   return opportunityCheck;
+    // }
 
     //new application
     const appData = {
       student_id: studId,
       opportunity_id: oppId,
-      applied_at: new Date().toISOString(),
       status: "applied", // Default status
     };
 
@@ -89,24 +88,76 @@ export async function getMyApplications(studId) {
 }
 
 //admin view
+// export async function getApplicantsByOpportunity(oppId) {
+//   try {
+//     const supabase = await createClient();
+
+//     const { data: applicants, error } = await supabase
+//       .from("applications")
+//       .select(`
+//     id,
+//     status,
+//     profiles (
+//       id,
+//       name,
+//       college,
+//       branch,
+//       skills,
+//     ),
+//     opportunities (
+//       company_name,
+//       role
+//     )
+//   `).eq("opportunity_id", opportunityId);
+
+//     if (error) {
+//       console.error("Error getting applicants: ", error.message);
+//       return { success: false, error: error.message };
+//     }
+
+//     return { success: true, data: applicants || [] };
+//   } catch (err) {
+//     console.error("Error getting applicants: ", err.message);
+//     return {
+//       success: false,
+//       error: "An unexpected error occurred while getting applicants",
+//     };
+//   }
+// }
 export async function getApplicantsByOpportunity(oppId) {
   try {
     const supabase = await createClient();
 
-    const { data: applicants, error } = await supabase
+    const { data, error } = await supabase
       .from("applications")
-      .select("*")
-      .eq("opportunity_id", oppId)
-      .order("applied_at", { ascending: false });
+      .select(`
+        id,
+        status,
+        profiles (
+          id,
+          name,
+          email,
+          college,
+          branch,
+          skills,
+          resume_url
+        ),
+        opportunities (
+          id,
+          company_name,
+          role
+        )
+      `)
+      .eq("opportunity_id", oppId);
 
     if (error) {
-      console.error("Error getting applicants: ", error.message);
+      console.error("Error getting applicants:", error.message);
       return { success: false, error: error.message };
     }
 
-    return { success: true, data: applicants || [] };
+    return { success: true, data: data ?? [] };
   } catch (err) {
-    console.error("Error getting applicants: ", err.message);
+    console.error("Error getting applicants:", err.message);
     return {
       success: false,
       error: "An unexpected error occurred while getting applicants",
@@ -136,6 +187,29 @@ export async function updateApplicationStatus(appId, statusValue) {
     return {
       success: false,
       error: "An unexpected error occurred while updating application status",
+    };
+  }
+}
+// get all applications
+export async function getAllApplications() {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error getting opportunities : ", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Error getting opportunities : ", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while getting opportunities",
     };
   }
 }

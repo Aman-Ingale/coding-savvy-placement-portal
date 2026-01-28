@@ -1,12 +1,32 @@
+"use client"
+import { getAllApplications } from "@/app/actions/applications.actions";
+import { getAllOpportunities } from "@/app/actions/opportunities.actions";
+import { getAllProfiles } from "@/app/actions/profile.actions";
 import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
-  const stats = [
-    { title: "Total Students", value: 1240 },
-    { title: "Total Opportunities", value: 36 },
-    { title: "Applications Submitted", value: 2890 },
-    { title: "Students Placed", value: 312 },
-  ];
+  const [stats, setStats] = useState([
+    { title: "Total Students", value: 0 },
+    { title: "Total Opportunities", value: 0 },
+    { title: "Applications Submitted", value: 0 },
+    { title: "Students Placed", value: 0 },
+  ]);
+  useEffect(() => {
+    async function getData() {
+      const opp = ((await getAllOpportunities())?.data?.length)
+      const stu = ((await getAllProfiles())?.data?.length)
+      const app = ((await getAllApplications())?.data?.length)
+      setStats([
+        { title: "Total Students", value: stu },
+        { title: "Total Opportunities", value: opp },
+        { title: "Applications Submitted", value: app },
+        { title: "Students Placed", value: 0 },
+      ])
+      console.log(stats)
+    }
+    getData()
+  }, [])
 
   return (
     <div>

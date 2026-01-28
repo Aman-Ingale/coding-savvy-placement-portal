@@ -34,9 +34,9 @@ export default function Sidebar({ open, setOpen }) {
           <Link href="/admin/opportunities" className="flex items-center gap-2 p-2 rounded text-gray-900 hover:bg-blue-50">
             <Briefcase size={18} className="text-blue-600" /> Opportunities
           </Link>
-          <Link href="/admin/applicants/" className="flex items-center gap-2 p-2 rounded text-gray-900 hover:bg-blue-50">
+          {/* <Link href="/admin/applicants/" className="flex items-center gap-2 p-2 rounded text-gray-900 hover:bg-blue-50">
             <Users size={18} className="text-blue-600" /> Applicants
-          </Link>
+          </Link> */}
           <Link href="/admin/students" className="flex items-center gap-2 p-2 rounded text-gray-900 hover:bg-blue-50">
             <GraduationCap size={18} className="text-blue-600" /> Students
           </Link>

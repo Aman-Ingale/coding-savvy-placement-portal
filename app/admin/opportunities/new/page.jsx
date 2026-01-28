@@ -1,40 +1,100 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { createOpportunity } from "@/app/actions/opportunities.actions";
 
 export default function NewOpportunity() {
+  const [opportunity, setOpportunity] = useState({
+    company_name: "",
+    role: "",
+    required_skills: "",
+    deadline: "",
+    description: "",
+  });
+
+  const handleChange = (field, value) => {
+    setOpportunity((prev) => ({ ...prev, [field]: value }));
+  };
+
+  async function handleCreate(){
+    try {
+      await createOpportunity(opportunity)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Opportunity</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        Create Opportunity
+      </h1>
 
       <Card className="shadow-sm">
         <CardContent className="p-6 space-y-4">
-          <Input placeholder="Company Name" className="text-gray-900" />
-          <Input placeholder="Role" className="text-gray-900" />
-          <Input placeholder="Required Skills" className="text-gray-900" />
-          <Input placeholder="Eligibility (e.g., B.Tech CS)" className="text-gray-900" />
-          <Input placeholder="Location (e.g., Remote/Bangalore)" className="text-gray-900" />
-          
-          {/* Package Range Dropdown */}
-          <Select>
-            <SelectTrigger className="text-gray-900">
-              <SelectValue placeholder="Select Package Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="4-6 LPA">4-6 LPA</SelectItem>
-              <SelectItem value="6-8 LPA">6-8 LPA</SelectItem>
-              <SelectItem value="8-10 LPA">8-10 LPA</SelectItem>
-              <SelectItem value="10+ LPA">10+ LPA</SelectItem>
-            </SelectContent>
-          </Select>
 
-          <Input type="date" className="text-gray-900" />
-          <Textarea placeholder="Opportunity Description" className="text-gray-900" />
-          <Button className="bg-blue-600 text-white w-full">Create Opportunity</Button>
+          <div className="space-y-1">
+            <Label htmlFor="company_name">Company Name</Label>
+            <Input
+              id="company_name"
+              value={opportunity.company_name}
+              onChange={(e) => handleChange("company_name", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="role">Role</Label>
+            <Input
+              id="role"
+              value={opportunity.role}
+              onChange={(e) => handleChange("role", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="required_skills">Required Skills</Label>
+            <Input
+              id="required_skills"
+              value={opportunity.required_skills}
+              onChange={(e) =>
+                handleChange("required_skills", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="deadline">Deadline</Label>
+            <Input
+              id="deadline"
+              type="date"
+              value={opportunity.deadline}
+              onChange={(e) => handleChange("deadline", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="description">Opportunity Description</Label>
+            <Textarea
+              id="description"
+              value={opportunity.description}
+              onChange={(e) =>
+                handleChange("description", e.target.value)
+              }
+            />
+          </div>
+
+          <Button
+            className="bg-blue-600 text-white w-full"
+            onClick={handleCreate}
+          >
+            Create Opportunity
+          </Button>
+
         </CardContent>
       </Card>
     </div>

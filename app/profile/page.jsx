@@ -10,7 +10,8 @@ export default function ProfilePage() {
   useEffect(() => {
     async function getData() {
       // Hardcoded for now, will be updated after auth
-      const data = await getProfileById("455be2f7-b09f-4c5c-9587-ee0d50440c14")
+      const data = await getProfileById("8694f8c4-39f4-4344-b225-419b586215d1")
+      console.log(data)
       setProfile(data.data)
     }
     getData()
