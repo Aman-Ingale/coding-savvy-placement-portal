@@ -42,8 +42,8 @@ export default function ApplicantsPage() {
   return (
     <div className="space-y-6">
       {opportunity && (
-        <Card className="border border-gray-200">
-          <CardContent className="p-5 space-y-3">
+        <Card className="border border-slate-200/80 bg-white rounded-xl">
+          <CardContent className="space-y-3 px-6 py-5">
             <h2 className="text-lg font-semibold text-gray-900">
               Opportunity Details
             </h2>

@@ -39,8 +39,12 @@ export async function middleware(req) {
     return res; // admin allowed
   }
 
-  // If route is /profile or /opportunities → only students
-  if (path.startsWith("/profile") || path.startsWith("/opportunities")) {
+  // If route is /profile, /opportunities, or /applications → only students
+  if (
+    path.startsWith("/profile") ||
+    path.startsWith("/opportunities") ||
+    path.startsWith("/applications")
+  ) {
     if (!user || user.email === ADMIN_EMAIL) {
       // admin cannot access student routes
       return NextResponse.redirect(new URL("/login", req.url));

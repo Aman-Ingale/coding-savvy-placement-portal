@@ -21,17 +21,24 @@ export default function StudentsPage() {
   }, []);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Students</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Students</h1>
+        <p className="text-sm text-muted-foreground">
+          Browse all registered student profiles.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {students.map((student) => (
-          <Card key={student?.id} className="hover:shadow-md transition">
-            <CardContent className="p-5 space-y-3">
-
+          <Card
+            key={student?.id}
+            className="border border-slate-200/80 bg-white hover:shadow-md transition-shadow rounded-xl"
+          >
+            <CardContent className="space-y-3 px-6 py-5">
               <div>
                 <Label className="text-xs text-gray-500">Name</Label>
-                <p className="font-semibold text-gray-900">
+                <p className="text-base font-semibold text-gray-900">
                   {student?.name ?? ""}
                 </p>
               </div>
@@ -56,7 +63,6 @@ export default function StudentsPage() {
                   {student?.skills ?? ""}
                 </p>
               </div>
-
             </CardContent>
           </Card>
         ))}

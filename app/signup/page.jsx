@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/supabaseClient";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,12 +17,14 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [errors, setErrors] = useState({ name: "", email: "", password: "" });
+  const router = useRouter()
   // ✅ FORM STATE
   const [formData, setFormData] = useState({
     name: "",
@@ -44,13 +47,30 @@ export default function SignupPage() {
 
     const { name, email, password } = formData;
 
-    if (!name || !email || !password) {
-      alert("All fields are required");
+    const nextErrors = { name: "", email: "", password: "" };
+    if (!name || name.trim().length < 2)
+      nextErrors.name = "Name must be at least 2 characters.";
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!emailOk) nextErrors.email = "Enter a valid email address.";
+    if (!password || password.length < 6)
+      nextErrors.password = "Password must be at least 6 characters.";
+
+    setErrors(nextErrors);
+    if (nextErrors.name || nextErrors.email || nextErrors.password) {
+      toast.error("Please fix the highlighted fields.");
       return;
     }
 
     setLoading(true);
-    await SignUp(email, password, name);
+    const res = await SignUp(email, password, name);
+    if (res?.success) {
+      toast.success("Account created. Please check your email to verify.");
+      router.push("/login")
+    } else if (res?.message) {
+      toast.error(res.message);
+    } else {
+      toast.error("Signup failed. Please try again.");
+    }
     setLoading(false);
   }
 
@@ -72,17 +92,19 @@ export default function SignupPage() {
 
       if (error) {
         console.log(error.message);
-        return;
+        return { success: false, message: error.message };
       }
 
       console.log("Signup success:", data);
+      return { success: true, data };
     } catch (err) {
       console.log(err);
+      return { success: false, message: err?.message || "Unexpected error" };
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-white to-blue-50 px-4">
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome to Coding Savvy</CardTitle>
@@ -91,12 +113,7 @@ export default function SignupPage() {
 
         <CardContent>
           {/* ROLE */}
-          <Tabs value={role} onValueChange={setRole}>
-            <TabsList className="grid grid-cols-2 mb-6">
-              <TabsTrigger value="student">Student</TabsTrigger>
-              <TabsTrigger value="admin">Admin</TabsTrigger>
-            </TabsList>
-          </Tabs>
+
 
           <form onSubmit={handleSignup} className="space-y-4">
             {/* NAME */}
@@ -107,7 +124,11 @@ export default function SignupPage() {
                 placeholder="John"
                 value={formData.name}
                 onChange={handleChange}
+                aria-invalid={!!errors.name}
               />
+              {errors.name ? (
+                <p className="text-xs text-destructive">{errors.name}</p>
+              ) : null}
             </div>
 
             {/* EMAIL */}
@@ -119,7 +140,11 @@ export default function SignupPage() {
                 placeholder="john@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
+                aria-invalid={!!errors.email}
               />
+              {errors.email ? (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              ) : null}
             </div>
 
             {/* PASSWORD */}
@@ -133,6 +158,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="pr-10"
+                  aria-invalid={!!errors.password}
                 />
                 <button
                   type="button"
@@ -142,6 +168,9 @@ export default function SignupPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {errors.password ? (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              ) : null}
             </div>
 
             {/* REMEMBER */}
@@ -158,18 +187,18 @@ export default function SignupPage() {
             {/* SUBMIT */}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login as {role}
+              Sign up
             </Button>
           </form>
 
           {/* OAUTH */}
-          <div className="flex items-center my-6">
+          {/* <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-border" />
             <span className="px-3 text-xs text-muted-foreground">OR</span>
             <div className="flex-1 h-px bg-border" />
-          </div>
+          </div> */}
 
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <Button variant="outline" className="w-full gap-2">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5" />
               Continue with Google
@@ -179,7 +208,7 @@ export default function SignupPage() {
               <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5" />
               Continue with GitHub
             </Button>
-          </div>
+          </div> */}
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Coding Savvy Platform

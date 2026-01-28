@@ -3,11 +3,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, GraduationCap } from "lucide-react";
 import { applyToOpportunity } from "@/app/actions/applications.actions";
+import { createClient } from "@/lib/supabase/supabaseClient";
+import { getProfileByUserId } from "@/app/actions/profile.actions";
 
 export default function OpportunityCard({ opportunity }) {
-  const stuid = "8694f8c4-39f4-4344-b225-419b586215d1"
-  function handleApply(id) {
-    applyToOpportunity(stuid,id)
+  async function handleApply(id) {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { success, data, error } = await getProfileByUserId(user.id);
+
+    if (success) {
+      applyToOpportunity(data.id,id)
+    } else {
+      console.error("Error fetching profile:", error);
+    }
   }
   return ( 
     <Card className="hover:shadow-xl transition-shadow rounded-xl h-full border border-gray-200 flex flex-col p-4">

@@ -24,12 +24,17 @@ export default function OpportunitiesPage() {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto px-4">
+    <div className="mx-auto w-full max-w-5xl px-4 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Opportunities
-        </h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Opportunities
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Manage and review all posted opportunities.
+          </p>
+        </div>
         <Link href="/admin/opportunities/new">
           <Button className="bg-blue-600 hover:bg-blue-700">
             + New Opportunity
@@ -42,10 +47,10 @@ export default function OpportunitiesPage() {
         {opportunities.map((opp) => (
           <Card
             key={opp.id}
-            className="border hover:shadow-md transition"
+            className="border border-slate-200/80 bg-white hover:shadow-md transition-shadow rounded-xl"
           >
-            <CardContent className="p-5">
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-6">
+            <CardContent className="px-6 py-5">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_220px]">
                 {/* LEFT CONTENT */}
                 <div className="space-y-3">
                   <div>
@@ -109,7 +114,7 @@ export default function OpportunitiesPage() {
                 </div>
 
                 {/* RIGHT ACTIONS */}
-                <div className="flex flex-col justify-between items-end gap-4">
+                <div className="flex flex-col items-end justify-between gap-4">
                   <div className="flex gap-2">
                     <Link href={`/admin/opportunities/${opp.id}/edit`}>
                       <Button variant="outline" size="sm">

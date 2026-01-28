@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/supabaseClient";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter()
+  const [errors, setErrors] = useState({ email: "", password: "" });
   // ✅ FORM STATE
   const [formData, setFormData] = useState({
     email: "",
@@ -45,13 +47,27 @@ export default function LoginPage() {
 
     const { email, password } = formData;
 
-    if (!email || !password) {
-      alert("Email and password are required");
+    const nextErrors = { email: "", password: "" };
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!emailOk) nextErrors.email = "Enter a valid email address.";
+    if (!password || password.length < 6)
+      nextErrors.password = "Password must be at least 6 characters.";
+    setErrors(nextErrors);
+
+    if (nextErrors.email || nextErrors.password) {
+      toast.error("Please fix the highlighted fields.");
       return;
     }
 
     setLoading(true);
     const result = await signIn(email, password);
+    if (result?.success) {
+      toast.success("Logged in successfully.");
+    } else if (result?.message) {
+      toast.error(result.message);
+    } else {
+      toast.error("Login failed. Please try again.");
+    }
     setLoading(false);
   }
 
@@ -73,52 +89,60 @@ export default function LoginPage() {
       console.log("Login success:", data);
       if (data.user.email == "admin@gmail.com") {
         router.push("admin/dashboard")
-      }
-      else {
-        const { user1: profile, error } = await supabase
+        return { success: true };
+      } else {
+        // Ensure we don't create duplicate profiles and handle "no profile yet" cleanly
+        const {
+          data: existingProfile,
+          error: profileError,
+        } = await supabase
           .from("profiles")
           .select("*")
           .eq("user_id", data.user.id)
-          .single();
+          .maybeSingle();
 
-        if (profile) {
-          router.push("opportunities")
+        if (profileError && profileError.code !== "PGRST116") {
+          console.error("Error fetching profile:", profileError.message);
+          return { success: false, message: profileError.message };
         }
-        else {
-          if((await getProfileByUserId(data.user.id)).success){
 
-            router.push("/profile/edit");
-          }
-          else{
-            const { error: createError } = await supabase
-              .from("profiles")
-              .upsert([
-                {
-                  user_id: data.user.id,
-                  name: data.user.user_metadata?.full_name
-                },
-              ])
-              .select()
-              .single();;
-  
-  
-            if (createError) {
-              console.error("Error creating profile:", createError.message);
-              return;
-            }
+        if (existingProfile) {
+          router.push("opportunities");
+          return { success: true };
+        } else {
+          const {
+            data: newProfile,
+            error: createError,
+          } = await supabase
+            .from("profiles")
+            .insert([
+              {
+                user_id: data.user.id,
+                name: data.user.user_metadata?.full_name,
+              },
+            ])
+            .select()
+            .single();
 
+          if (createError) {
+            console.error("Error creating profile:", createError.message);
+            return { success: false, message: createError.message };
           }
+
+          router.push("/profile/edit");
+          return { success: true };
         }
       }
       // 🔥 OPTIONAL: role-based redirect later
       // const role = data.user.user_metadata.role
     } catch (err) {
       console.log(err);
+      return { success: false, message: err?.message || "Unexpected error" };
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-white to-blue-50 px-4">
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome to Coding Savvy</CardTitle>
@@ -127,12 +151,6 @@ export default function LoginPage() {
 
         <CardContent>
           {/* ROLE */}
-          <Tabs value={role} onValueChange={setRole}>
-            <TabsList className="grid grid-cols-2 mb-6">
-              <TabsTrigger value="student">Student</TabsTrigger>
-              <TabsTrigger value="admin">Admin</TabsTrigger>
-            </TabsList>
-          </Tabs>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {/* EMAIL */}
@@ -144,7 +162,11 @@ export default function LoginPage() {
                 placeholder="john@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
+                aria-invalid={!!errors.email}
               />
+              {errors.email ? (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              ) : null}
             </div>
 
             {/* PASSWORD */}
@@ -158,6 +180,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="pr-10"
+                  aria-invalid={!!errors.password}
                 />
                 <button
                   type="button"
@@ -167,6 +190,9 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {errors.password ? (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              ) : null}
             </div>
 
             {/* REMEMBER */}
@@ -183,19 +209,19 @@ export default function LoginPage() {
             {/* SUBMIT */}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login as {role}
+              Login
             </Button>
           </form>
 
           {/* DIVIDER */}
-          <div className="flex items-center my-6">
+          {/* <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-border" />
             <span className="px-3 text-xs text-muted-foreground">OR</span>
             <div className="flex-1 h-px bg-border" />
-          </div>
+          </div> */}
 
           {/* OAUTH */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <Button variant="outline" className="w-full gap-2">
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -211,7 +237,7 @@ export default function LoginPage() {
               />
               Continue with GitHub
             </Button>
-          </div>
+          </div> */}
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Coding Savvy Platform
