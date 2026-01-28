@@ -18,6 +18,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [role, setRole] = useState("student");
@@ -190,6 +191,17 @@ export default function SignupPage() {
               Sign up
             </Button>
           </form>
+
+          {/* Login link */}
+          <div className="mt-6 text-center text-sm">
+            <span className="text-muted-foreground">Already have an account? </span>
+            <Link
+              href="/login"
+              className="text-blue-600 hover:text-blue-700 font-medium underline underline-offset-2"
+            >
+              Log in
+            </Link>
+          </div>
 
           {/* OAUTH */}
           {/* <div className="flex items-center my-6">

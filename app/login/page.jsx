@@ -18,6 +18,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createProfile, getProfileByUserId } from "../actions/profile.actions";
 
 export default function LoginPage() {
@@ -212,6 +213,17 @@ export default function LoginPage() {
               Login
             </Button>
           </form>
+
+          {/* Sign up link */}
+          <div className="mt-6 text-center text-sm">
+            <span className="text-muted-foreground">Don't have an account? </span>
+            <Link
+              href="/signup"
+              className="text-blue-600 hover:text-blue-700 font-medium underline underline-offset-2"
+            >
+              Sign up
+            </Link>
+          </div>
 
           {/* DIVIDER */}
           {/* <div className="flex items-center my-6">
