@@ -29,25 +29,27 @@ export default function DashboardPage() {
   }, [])
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
+    <div className="mx-auto max-w-7xl space-y-8">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-muted-foreground text-base">
           Overview of students, opportunities, and applications.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <Card
             key={i}
-            className="border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60"
+            className="border border-slate-200/80 bg-white hover:shadow-lg transition-all duration-200 rounded-xl overflow-hidden group"
           >
-            <CardContent className="px-6 py-5 space-y-2">
+            <CardContent className="px-6 py-6 space-y-2">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {stat.title}
               </p>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-blue-600 group-hover:scale-105 transition-transform">
                 {stat.value}
               </p>
             </CardContent>

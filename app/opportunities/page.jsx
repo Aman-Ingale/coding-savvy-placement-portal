@@ -39,41 +39,60 @@ export default function OpportunitiesPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Explore Opportunities</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Explore Opportunities
+          </h1>
+          <p className="text-muted-foreground text-base">
             Find jobs, internships, and career opportunities
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className="max-w-xl mx-auto relative">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            size={18}
-          />
-          <Input
-            placeholder="Search by role, company, or skill..."
-            className="pl-10"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              size={20}
+            />
+            <Input
+              placeholder="Search by role, company, or skill..."
+              className="pl-12 h-12 text-base border-slate-300 focus-visible:ring-blue-500 focus-visible:border-blue-500"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {search && (
+            <p className="text-sm text-slate-500 mt-2 text-center">
+              {filteredOpportunities.length} opportunity
+              {filteredOpportunities.length !== 1 ? "ies" : "y"} found
+            </p>
+          )}
         </div>
 
         {/* Opportunities Grid */}
         {filteredOpportunities.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredOpportunities?.map((opportunity, index) => (
-              <OpportunityCard
-                key={index}
-                opportunity={opportunity}
-              />
+              <OpportunityCard key={opportunity.id || index} opportunity={opportunity} />
             ))}
           </div>
         ) : (
-          <p className="text-center text-muted-foreground">
-            No opportunities found.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">
+              {search
+                ? "No opportunities match your search."
+                : "No opportunities available at the moment."}
+            </p>
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="text-blue-600 hover:text-blue-700 text-sm mt-2 underline"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -3,44 +3,75 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Mail, GraduationCap, Building2 } from "lucide-react";
 
 export default function ProfileCard({ profile }) {
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <Card className="h-fit bg-white shadow-md border border-slate-200">
-      <CardContent className="p-6 text-center space-y-4">
-
-        <Avatar className="w-28 h-28 mx-auto">
-          {/* {profile.image && (
-            <AvatarImage
-              src={profile.image}
-              alt="Profile image"
-            />
-          )} */}
-          <AvatarFallback className="bg-blue-600 text-white text-2xl">
-            {profile?.name?.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-
-        <div>
-          <h2 className="text-xl font-semibold">{profile?.name}</h2>
-          <p className="text-sm text-slate-500">{profile?.branch}</p>
+    <Card className="h-fit bg-white shadow-md border border-slate-200/80 rounded-xl overflow-hidden">
+      <CardContent className="p-6 space-y-5">
+        {/* Avatar & Name */}
+        <div className="text-center space-y-3">
+          <Avatar className="w-24 h-24 mx-auto border-2 border-blue-100">
+            <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
+              {getInitials(profile?.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">
+              {profile?.name || "No Name"}
+            </h2>
+            {profile?.branch && (
+              <p className="text-sm text-slate-500 mt-1">{profile.branch}</p>
+            )}
+          </div>
         </div>
 
-        <div className="text-sm text-slate-700 space-y-1">
-          <p><strong>College:</strong> {profile?.college}</p>
-          <p><strong>Email:</strong> {profile?.email}</p>
+        {/* Details */}
+        <div className="space-y-3 pt-3 border-t border-slate-100">
+          {profile?.college && (
+            <div className="flex items-start gap-2.5 text-sm">
+              <Building2 size={16} className="text-blue-600 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-0.5">
+                  College
+                </p>
+                <p className="text-gray-900">{profile.college}</p>
+              </div>
+            </div>
+          )}
+
+          {profile?.email && (
+            <div className="flex items-start gap-2.5 text-sm">
+              <Mail size={16} className="text-blue-600 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-0.5">
+                  Email
+                </p>
+                <p className="text-gray-900 break-all">{profile.email}</p>
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* Edit Button */}
         <Button
           asChild
-          className="w-full bg-blue-600 hover:bg-blue-700"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium mt-4"
         >
           <Link href="/profile/edit">Edit Profile</Link>
         </Button>
-
       </CardContent>
     </Card>
   );

@@ -223,7 +223,37 @@ export async function deleteProfileById(profileId) {
     };
   }
 }
+export async function getProfileByUserId(userId) {
+  if (!userId) {
+    return { 
+      success: false, 
+      error: "User ID is required" 
+    };
+  }
 
+  try {
+    const supabase = await createClient();
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .single(); // single ensures we get one record
+
+    if (error) {
+      console.error("Error fetching profile:", error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: profile };
+  } catch (err) {
+    console.error("Unexpected error fetching profile:", err.message);
+    return {
+      success: false,
+      error: "An unexpected error occurred while fetching profile",
+    };
+  }
+}
 // function processSkills(skills) {
 //   if (!skills) return [];
 

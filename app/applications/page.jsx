@@ -7,6 +7,8 @@ import { getProfileByUserId } from "@/app/actions/profile.actions";
 import { getMyApplications } from "@/app/actions/applications.actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Briefcase, Building2, Calendar, FileText } from "lucide-react";
 
 function formatDate(value) {
   if (!value) return "-";
@@ -113,41 +115,111 @@ export default function MyApplicationsPage() {
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : hasApps ? (
             <div className="grid grid-cols-1 gap-4">
-              {applications.map((app) => (
-                <Card
-                  key={app.id}
-                  className="border border-slate-200/80 bg-white hover:shadow-md transition-shadow rounded-xl"
-                >
-                  <CardContent className="px-6 py-5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-1">
-                        <p className="text-sm text-slate-500">
-                          Opportunity ID
-                        </p>
-                        <p className="font-semibold text-gray-900">
-                          {app.opportunity_id}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Applied on {formatDate(app.applied_at)}
-                        </p>
+              {applications.map((app) => {
+                const opp = app.opportunities;
+                return (
+                  <Card
+                    key={app.id}
+                    className="border border-slate-200/80 bg-white hover:shadow-lg transition-all duration-200 rounded-xl overflow-hidden group"
+                  >
+                    <CardContent className="px-6 py-5">
+                      <div className="space-y-4">
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Briefcase
+                                size={18}
+                                className="text-blue-600 shrink-0"
+                              />
+                              <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {opp?.role || "Unknown Role"}
+                              </h3>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-blue-600 font-medium">
+                              <Building2 size={14} />
+                              <span>{opp?.company_name || "Unknown Company"}</span>
+                            </div>
+                          </div>
+                          <Badge
+                            variant={
+                              app.status === "shortlisted"
+                                ? "default"
+                                : app.status === "rejected"
+                                ? "destructive"
+                                : "secondary"
+                            }
+                            className="shrink-0"
+                          >
+                            {app.status || "applied"}
+                          </Badge>
+                        </div>
+
+                        {/* Opportunity Details */}
+                        {opp && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+                            {opp.description && (
+                              <div className="sm:col-span-2">
+                                <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                  Description
+                                </Label>
+                                <p className="text-sm text-gray-700 mt-1.5 line-clamp-2">
+                                  {opp.description}
+                                </p>
+                              </div>
+                            )}
+
+                            {opp.required_skills && (
+                              <div>
+                                <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                  Required Skills
+                                </Label>
+                                <p className="text-sm text-gray-700 mt-1.5">
+                                  {opp.required_skills}
+                                </p>
+                              </div>
+                            )}
+
+                            {opp.deadline && (
+                              <div>
+                                <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                  Deadline
+                                </Label>
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                  <Calendar size={14} className="text-slate-400" />
+                                  <p className="text-sm text-gray-700">
+                                    {new Date(opp.deadline).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      }
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <FileText size={12} />
+                            <span>Applied on {formatDate(app.applied_at)}</span>
+                          </div>
+                          {opp?.status && (
+                            <Badge variant="outline" className="text-xs">
+                              {opp.status}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            app.status === "shortlisted"
-                              ? "default"
-                              : app.status === "rejected"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                        >
-                          {app.status || "unknown"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <Card className="border border-slate-200/80 bg-white rounded-xl">

@@ -53,18 +53,33 @@ export default function ProfilePage() {
       : [];
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8">
-      <div className="mx-auto flex max-w-5xl items-center justify-between pb-4">
-        <h1 className="text-xl font-semibold">Your Profile</h1>
-        <Button variant="outline" size="sm" onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
-      <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
-        <ProfileCard profile={profile} />
-        <div className="space-y-6 md:col-span-2">
-          <SkillsList skills={skills} />
-          <ResumeCard resumeUrl={profile?.resume_url} />
+    <div className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto max-w-5xl space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Your Profile</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Manage your profile information and documents
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleLogout}
+            className="text-slate-700 hover:text-slate-900"
+          >
+            Logout
+          </Button>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid gap-6 md:grid-cols-3">
+          <ProfileCard profile={profile} />
+          <div className="space-y-6 md:col-span-2">
+            <SkillsList skills={skills} />
+            <ResumeCard resumeUrl={profile?.resume_url} />
+          </div>
         </div>
       </div>
     </div>

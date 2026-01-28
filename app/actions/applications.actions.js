@@ -68,7 +68,18 @@ export async function getMyApplications(studId) {
 
     const { data: studApplications, error } = await supabase
       .from("applications")
-      .select("*")
+      .select(`
+        *,
+        opportunities (
+          id,
+          role,
+          company_name,
+          description,
+          required_skills,
+          deadline,
+          status
+        )
+      `)
       .eq("student_id", studId)
       .order("applied_at", { ascending: false });
 

@@ -18,39 +18,45 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
       <Sidebar open={open} setOpen={setOpen} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col md:ml-64">
         {/* Header */}
-        <div className="sticky top-0 z-40 flex items-center justify-between bg-white/80 backdrop-blur supports-backdrop-filter:bg-white/70 border-b px-4 py-3 shadow-sm">
+        <div className="sticky top-0 z-40 flex items-center justify-between bg-white/80 backdrop-blur supports-backdrop-filter:bg-white/70 border-b border-slate-200/80 px-6 py-4 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="md:hidden">
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => setOpen(true)}
+                className="h-9 w-9"
               >
-                <Menu />
+                <Menu size={20} />
               </Button>
             </div>
-            <h1 className="font-bold text-blue-600 text-base">
-              Coding Savvy
-            </h1>
+            <div>
+              <h1 className="font-bold text-gray-900 text-lg">
+                Coding Savvy
+              </h1>
+              <p className="text-xs text-slate-500 hidden sm:block">
+                Administration Dashboard
+              </p>
+            </div>
           </div>
           <Button
             variant="outline"
             size="sm"
-            className="text-xs"
+            className="text-sm font-medium"
             onClick={handleLogout}
           >
             Logout
           </Button>
         </div>
 
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6 md:p-8">{children}</main>
       </div>
     </div>
   );
