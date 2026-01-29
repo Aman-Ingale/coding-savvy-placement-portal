@@ -44,12 +44,12 @@ export async function createOpportunity(opportunityData) {
       description: opportunityData.description?.trim() || "",
       status: opportunityData.status?.trim() || "Open",
       required_skills: opportunityData.required_skills,
-      salary: opportunityData.salary ? Number(opportunityData.salary) : "",
-      experience: opportunityData.experience
-        ? Number(opportunityData.experience)
-        : "",
-      location: opportunityData.location?.trim() || "",
-      no_of_opening : opportunityData.no_of_opening
+      // salary: opportunityData.salary ? Number(opportunityData.salary) : "",
+      // experience: opportunityData.experience
+      //   ? Number(opportunityData.experience)
+      //   : "",
+      // location: opportunityData.location?.trim() || "",
+      // no_of_opening: opportunityData.no_of_opening
     };
 
     const { data: newOpportunity, error } = await supabase
@@ -204,3 +204,58 @@ export async function getOpportunityById(id) {
     };
   }
 }
+export async function getAllNonAppliedOpportunities(userId) {
+  try {
+    const supabase = await createClient();
+
+    const { data: profiles, error: proError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("user_id", userId)
+      .single();
+
+    if (proError || !profiles) {
+      return { success: false, error: "Profile not found" };
+    }
+
+    const studentId = profiles.id;
+
+    const { data: applied, error: appError } = await supabase
+      .from("applications")
+      .select("opportunity_id")
+      .eq("student_id", studentId);
+
+    if (appError) {
+      return { success: false, error: appError.message };
+    }
+
+    const appliedIds = applied.map(a => a.opportunity_id);
+
+    const { data: opp, error: oppError } = await supabase
+      .from("opportunities")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (oppError) {
+      return { success: false, error: oppError.message };
+    }
+
+    if (appliedIds.length === 0) {
+      return { success: true, data: opp };
+    }
+
+    const appliedSet = new Set(appliedIds);
+
+    const filteredOpportunities = opp.filter(
+      item => !appliedSet.has(item.id)
+    );
+
+    return { success: true, data: filteredOpportunities };
+
+  } catch (err) {
+    console.error(err);
+    return { success: false, error: "Unexpected error" };
+  }
+}
+
+

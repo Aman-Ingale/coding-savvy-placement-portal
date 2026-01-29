@@ -5,7 +5,7 @@ import OpportunityCard from "@/components/OpportunityCard";
 // import { opportunities } from "@/data/opportunities";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { getAllOpportunities } from "../actions/opportunities.actions";
+import { getAllNonAppliedOpportunities, getAllOpportunities } from "../actions/opportunities.actions";
 import { createClient } from "@/lib/supabase/supabaseClient";
 import { useRouter } from "next/navigation";
 
@@ -19,20 +19,20 @@ export default function OpportunitiesPage() {
       .toLowerCase()
       .includes(search.toLowerCase())
   );
-  useEffect(() => {
-    async function getData() {
-      const supabase = await createClient();
-      const { data: { user }, error } = await supabase.auth.getUser()
+  async function getData() {
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-      if (error || !user) {
-        router.push('/login')
-      }
-      else {
-        const temp = await getAllOpportunities()
-        setOpportunities(temp.data)
-        console.log(temp.data)
-      }
+    if (error || !user) {
+      router.push('/login')
     }
+    else {
+      const temp = await getAllNonAppliedOpportunities(user.id)
+      console.log(user.id)
+      setOpportunities(temp.data)
+    }
+  }
+  useEffect(() => {
     getData()
   }, [])
   return (

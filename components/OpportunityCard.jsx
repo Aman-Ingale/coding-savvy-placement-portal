@@ -10,9 +10,9 @@ import { getProfileByUserId } from "@/app/actions/profile.actions";
 import { useState } from "react";
 import { toast } from "sonner";
 
+
 export default function OpportunityCard({ opportunity }) {
   const [applying, setApplying] = useState(false);
-
   async function handleApply(id) {
     setApplying(true);
     try {
@@ -23,7 +23,7 @@ export default function OpportunityCard({ opportunity }) {
         toast.error("Please log in to apply");
         return;
       }
-
+      
       const { success, data, error } = await getProfileByUserId(user.id);
 
       if (success && data) {
