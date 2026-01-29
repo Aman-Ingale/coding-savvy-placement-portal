@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/supabaseClient";
+import { createClient } from "@/lib/supabase/supabaseServer";
 
 export async function createProfile(profileData) {
   try {

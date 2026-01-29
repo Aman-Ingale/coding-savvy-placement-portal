@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/supabaseClient";
+import { createClient } from "@/lib/supabase/supabaseServer";
 
 
 async function checkDeadline(supabase, oppId) {
