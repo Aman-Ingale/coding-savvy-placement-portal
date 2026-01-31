@@ -25,7 +25,7 @@ export async function getResumeFeedback(formData) {
                 Do not include explanations or markdown.
                 JSON schema:
                 {
-                    "overallScore": number (0-10),
+                    "overallScore": number (0-100),
                     "missingSkills": string[],
                     "formattingSuggestions": string[]
                 }`,
