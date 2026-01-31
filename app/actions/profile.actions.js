@@ -117,7 +117,11 @@ async function uploadResume(file) {
   }
 
   const safeName = file.name.replace(/\s+/g, "_");
-  const filePath = `${user.id}/${Date.now()}_${safeName}`;
+  const filePath = `${user.id}/resume_${safeName}`;
+
+  await supabase.storage
+    .from("resumes")
+    .remove([filePath]);
 
   const { error } = await supabase.storage
     .from("resumes")
@@ -132,6 +136,7 @@ async function uploadResume(file) {
 
   return { success: true, path: filePath };
 }
+
 
 export async function getProfileById(profileId) {
   if (!profileId) {
