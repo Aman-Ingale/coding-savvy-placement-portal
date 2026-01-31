@@ -8,6 +8,7 @@ import { getProfileByUserId } from "../actions/profile.actions";
 import { createClient } from "@/lib/supabase/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({});
@@ -34,7 +35,7 @@ export default function ProfilePage() {
         return;
       }
 
-      setProfile({...result.data, email : user.email});
+      setProfile({ ...result.data, email: user.email });
     }
 
     getData();
@@ -79,6 +80,11 @@ export default function ProfilePage() {
           <div className="space-y-6 md:col-span-2">
             <SkillsList skills={skills} />
             <ResumeCard resumeUrl={profile?.resume_url} />
+            <Link href="./profile/resume-feedback">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Get Resume Feedback
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
